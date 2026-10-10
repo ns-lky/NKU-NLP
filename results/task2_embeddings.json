@@ -54,7 +54,7 @@
       "scipy": "1.16.3",
       "scikit-learn": "1.7.2",
       "gensim": "4.4.0",
-      "torch": "2.12.0",
+      "torch": "2.8.0+cu126",
       "transformers": "5.3.0"
     },
     "argv": [
