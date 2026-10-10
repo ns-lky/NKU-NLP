@@ -8,6 +8,7 @@ import importlib.metadata
 import random
 import re
 import sys
+import zlib
 from pathlib import Path
 from typing import Iterable
 
@@ -31,6 +32,12 @@ def tokenize(text: str) -> list[str]:
     """Tokenize news text without requiring an external NLTK data download."""
 
     return TOKEN_RE.findall(str(text).lower())
+
+
+def stable_hash(word: str) -> int:
+    """Keep gensim's hash function in an importable module for model reloads."""
+
+    return zlib.crc32(word.encode("utf-8"))
 
 
 def load_nyt(path: str | Path) -> pd.DataFrame:

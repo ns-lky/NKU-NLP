@@ -8,10 +8,9 @@
 
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-pip install -r requirements.txt
 ```
+
+激活虚拟环境：PowerShell 使用 `.\.venv\Scripts\Activate.ps1`，Linux/macOS 使用 `source .venv/bin/activate`。本地已经建立好的环境也可以直接使用 `.\.venv\Scripts\python.exe` 代替下列命令中的 `python`。
 
 Python 3.13.2 为本次运行环境。依赖版本已固定。使用支持 CUDA 12.6 的 NVIDIA 显卡时，先在虚拟环境中安装 GPU 版 PyTorch，再安装其他依赖：
 
@@ -21,7 +20,15 @@ python -m pip install -r requirements.txt --cache-dir artifacts/pip-cache
 python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 ```
 
-运行命令均在仓库根目录执行。以下单行命令同时适用于 PowerShell 和 bash。
+仅使用 CPU 时直接执行 `python -m pip install -r requirements.txt --cache-dir artifacts/pip-cache`。运行命令均在仓库根目录执行。以下单行命令同时适用于 PowerShell 和 bash。
+
+先准备正式实验使用的预训练资源：
+
+```bash
+python -u -m scripts.download_assets
+```
+
+此命令从 Stanford 官方下载 `glove.6B.zip`，解出 100 维文件并核对 SHA-256，同时准备 Hugging Face 官方 `google-bert/bert-base-uncased`。BERT 固定使用版本 `86b5e0934494bd15c9632b12f734a8a67f723594`，下载和训练共用工作区内的缓存。已有资源会被复用；训练时仅从已准备的本地官方缓存加载。也可用 `--asset glove` 或 `--asset bert` 单独准备。
 
 ## Task 1：Bag of Words
 
@@ -55,7 +62,7 @@ Word2Vec 使用 Skip-gram、window=5、min_count=2、epochs=5、seed=42。默认
 
 ## Task 3：BERT
 
-首次运行会从 Hugging Face 下载 `google-bert/bert-base-uncased`（需要网络和足够磁盘空间）：
+先运行上述资源准备命令，再微调官方 `google-bert/bert-base-uncased`：
 
 ```bash
 python -u -m scripts.task3_bert
@@ -66,3 +73,27 @@ python -u -m scripts.task3_bert
 每轮验证结束保存训练历史和可恢复检查点；可用 `python -u -m scripts.task3_bert --resume` 从已完成的 epoch 继续。完成三轮后，根据验证集 Macro-F1 选择模型，再在完整测试集上评价。最佳模型和 tokenizer 保存到 `models/task3_bert/`；所有 Hugging Face 缓存位于工作区 `artifacts/huggingface/`。
 
 三个脚本都会输出 Accuracy、Macro-F1、各类别 Precision/Recall/F1、混淆矩阵、真实参数和依赖版本。对应 JSON 为 `results/task1_bow.json`、`results/task2_embeddings.json`、`results/task3_bert.json`；`results/predictions/` 保存有序的验证集和测试集逐条预测（行号、真实标签、预测标签，不含新闻正文）。
+
+## 全部正式结果与复核
+
+以下结果均来自完整 NYT 测试集的 1,152 条文本：
+
+| 任务 | 方法 | Accuracy | Macro-F1 |
+| --- | --- | ---: | ---: |
+| Task 1 | Binary BoW + LR | 0.989583 | 0.974058 |
+| Task 1 | Word Frequency + LR | 0.992188 | 0.980103 |
+| Task 1 | TF-IDF + LR | 0.986111 | 0.969559 |
+| Task 2 | GloVe 6B 100d + LR | 0.985243 | 0.964617 |
+| Task 2 | AG News Word2Vec 100d + LR | 0.974826 | 0.938885 |
+| Task 2 | NYT Word2Vec 100d + LR | 0.982639 | 0.956510 |
+| Task 3 | BERT-base-uncased，64 tokens，3 epochs | 0.982639 | 0.960523 |
+
+BERT 使用本地 RTX 4060 Laptop GPU、PyTorch 2.8.0+cu126 完整微调，每轮训练 9,215 条文本、576 个 batch。三轮验证 Macro-F1 依次为 0.908322、0.941443、0.951956，最佳模型为第 3 轮。
+
+独立复核全部逐条预测、数据划分、指标与 BERT 正式配置：
+
+```bash
+python -m scripts.verify_results
+```
+
+此命令检查 7 个模型共 16,128 条验证/测试预测并生成 `results/verification.json` 与 `results/metrics_summary.csv`。正式产物以 `results/` 为准；`outputs/` 中早期开发用的冒烟结果不参与上述比较。大型向量文件、模型权重及训练检查点保存在本地，重新训练可由仓库脚本生成。

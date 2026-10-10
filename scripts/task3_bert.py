@@ -22,6 +22,7 @@ from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
 
 from src.common import classification_metrics, prepare_nyt, run_metadata, save_evaluation, set_seed, write_json
+from scripts.download_assets import BERT_REVISION
 
 MODEL_NAME = "google-bert/bert-base-uncased"
 
@@ -70,7 +71,7 @@ def run(args):
     labels = sorted(frame.label.unique())
     label_to_id = {label: index for index, label in enumerate(labels)}
     id_to_label = {index: label for label, index in label_to_id.items()}
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, cache_dir=HF_HOME / "hub", use_fast=True, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision=BERT_REVISION, cache_dir=HF_HOME / "hub", use_fast=True, local_files_only=True)
     datasets = [EncodedNews(part, tokenizer, label_to_id) for part in (train, validation, test)]
     shuffle_rng = torch.Generator().manual_seed(args.seed)
     loaders = [
@@ -81,7 +82,7 @@ def run(args):
     ]
     train_loader, val_loader, test_loader = loaders
     model = AutoModelForSequenceClassification.from_pretrained(
-        MODEL_NAME, cache_dir=HF_HOME / "hub", local_files_only=True, num_labels=len(labels),
+        MODEL_NAME, revision=BERT_REVISION, cache_dir=HF_HOME / "hub", local_files_only=True, num_labels=len(labels),
         id2label=id_to_label, label2id=label_to_id,
     ).to(device)
     decay, no_decay = [], []

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import zlib
 from pathlib import Path
 from typing import Iterable, Mapping
 
@@ -12,7 +11,7 @@ import numpy as np
 import joblib
 from sklearn.linear_model import LogisticRegression
 
-from src.common import load_ag_texts, prepare_nyt, run_metadata, save_evaluation, set_seed, tokenize, write_json
+from src.common import load_ag_texts, prepare_nyt, run_metadata, save_evaluation, set_seed, stable_hash, tokenize, write_json
 
 
 def load_glove(path: Path, dimension: int = 100) -> dict[str, np.ndarray]:
@@ -40,10 +39,6 @@ def mean_vectors(tokenized_documents: Iterable[list[str]], vectors: Mapping[str,
         known = [vectors[token] for token in tokens if token in vectors]
         output.append(np.mean(known, axis=0, dtype=np.float32) if known else zero)
     return np.asarray(output, dtype=np.float32)
-
-
-def stable_hash(word: str) -> int:
-    return zlib.crc32(word.encode("utf-8"))
 
 
 def coverage(documents, vectors) -> dict:
