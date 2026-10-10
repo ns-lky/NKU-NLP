@@ -1,0 +1,18 @@
+# Local data and generated experiment outputs
+HW-1/*.csv
+HW-1/.DS_Store
+artifacts/
+outputs/
+models/
+glove*.zip
+glove*.txt
+
+# Python tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local assignment source
+*.docx
