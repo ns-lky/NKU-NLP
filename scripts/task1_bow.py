@@ -6,10 +6,11 @@ import argparse
 from collections import OrderedDict
 from pathlib import Path
 
+import joblib
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
-from src.common import classification_metrics, load_nyt, set_seed, split_nyt, tokenize, write_json
+from src.common import prepare_nyt, run_metadata, save_evaluation, set_seed, tokenize, write_json
 
 
 def build_vectorizers(max_features: int | None) -> OrderedDict[str, object]:
@@ -31,8 +32,7 @@ def build_vectorizers(max_features: int | None) -> OrderedDict[str, object]:
 
 def run(args: argparse.Namespace) -> dict:
     set_seed(args.seed)
-    frame = load_nyt(args.nyt)
-    train, validation, test = split_nyt(frame, args.seed)
+    frame, train, validation, test, split = prepare_nyt(args.nyt, args.seed)
     results: dict[str, dict] = {}
 
     for name, vectorizer in build_vectorizers(args.max_features).items():
@@ -45,13 +45,20 @@ def run(args: argparse.Namespace) -> dict:
             random_state=args.seed,
         )
         classifier.fit(x_train, train["label"])
-        validation_metrics = classification_metrics(
-            validation["label"], classifier.predict(x_validation)
+        validation_metrics = save_evaluation(
+            validation, classifier.predict(x_validation),
+            args.output.parent / "predictions" / f"task1_{name}_validation.csv",
         )
-        test_metrics = classification_metrics(test["label"], classifier.predict(x_test))
+        test_metrics = save_evaluation(
+            test, classifier.predict(x_test),
+            args.output.parent / "predictions" / f"task1_{name}_test.csv",
+        )
+        args.model_dir.mkdir(parents=True, exist_ok=True)
+        joblib.dump({"vectorizer": vectorizer, "classifier": classifier}, args.model_dir / f"{name}.joblib")
         results[name] = {
             "vocabulary_size": int(len(vectorizer.vocabulary_)),
             "train_documents": int(len(train)),
+            "iterations": classifier.n_iter_.tolist(),
             "validation": validation_metrics,
             "test": test_metrics,
         }
@@ -64,7 +71,8 @@ def run(args: argparse.Namespace) -> dict:
     payload = {
         "task": "Task 1 - Bag of Words",
         "seed": args.seed,
-        "split": {"train": 0.8, "validation": 0.1, "test": 0.1},
+        "split": split,
+        "run": run_metadata(args),
         "results": results,
     }
     write_json(args.output, payload)
@@ -74,7 +82,8 @@ def run(args: argparse.Namespace) -> dict:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--nyt", type=Path, default=Path("HW-1/nyt.csv"))
-    parser.add_argument("--output", type=Path, default=Path("outputs/task1_bow.json"))
+    parser.add_argument("--output", type=Path, default=Path("results/task1_bow.json"))
+    parser.add_argument("--model-dir", type=Path, default=Path("models/task1_bow"))
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max-iter", type=int, default=1000)
     parser.add_argument("--max-features", type=int, default=None)
