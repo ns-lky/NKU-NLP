@@ -1,0 +1,61 @@
+{
+  "split": {
+    "seed": 42,
+    "strategy": "stratified shuffled 80/10/10",
+    "dataset_sha256": "de12ebe7f41316b798896bf975da840e2998f82393328d375fe5456a14e9eb2d",
+    "dataset_rows": 11519,
+    "split_sha256": "02a5c4bb49199cc9103d887fe0c02124bb5284f3d56395c4fdef7e852136ab26",
+    "sizes": {
+      "train": 9215,
+      "validation": 1152,
+      "test": 1152
+    },
+    "class_counts": {
+      "train": {
+        "sports": 6911,
+        "politics": 1161,
+        "business": 1143
+      },
+      "validation": {
+        "sports": 864,
+        "politics": 145,
+        "business": 143
+      },
+      "test": {
+        "sports": 864,
+        "politics": 145,
+        "business": 143
+      }
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.23697687998687927,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.134581599999365,
+      "accuracy": 0.9600694444444444,
+      "macro_f1": 0.908321710316263
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.05264216228082525,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.09245659999942,
+      "accuracy": 0.9739583333333334,
+      "macro_f1": 0.9414428612261668
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.017625666777181376,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.00664549999965,
+      "accuracy": 0.9782986111111112,
+      "macro_f1": 0.9519557452089021
+    }
+  ],
+  "best_epoch": 3
+}

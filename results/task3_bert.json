@@ -1,0 +1,249 @@
+{
+  "task": "Task 3 - BERT fine-tuning",
+  "model_name": "google-bert/bert-base-uncased",
+  "max_length": 64,
+  "epochs": 3,
+  "seed": 42,
+  "device": "cuda",
+  "mixed_precision": "fp16",
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "labels": [
+    "business",
+    "politics",
+    "sports"
+  ],
+  "split": {
+    "seed": 42,
+    "strategy": "stratified shuffled 80/10/10",
+    "dataset_sha256": "de12ebe7f41316b798896bf975da840e2998f82393328d375fe5456a14e9eb2d",
+    "dataset_rows": 11519,
+    "split_sha256": "02a5c4bb49199cc9103d887fe0c02124bb5284f3d56395c4fdef7e852136ab26",
+    "sizes": {
+      "train": 9215,
+      "validation": 1152,
+      "test": 1152
+    },
+    "class_counts": {
+      "train": {
+        "sports": 6911,
+        "politics": 1161,
+        "business": 1143
+      },
+      "validation": {
+        "sports": 864,
+        "politics": 145,
+        "business": 143
+      },
+      "test": {
+        "sports": 864,
+        "politics": 145,
+        "business": 143
+      }
+    }
+  },
+  "run": {
+    "arguments": {
+      "nyt": "HW-1\\nyt.csv",
+      "model_name": "google-bert/bert-base-uncased",
+      "max_length": 64,
+      "epochs": 3,
+      "output": "results\\task3_bert.json",
+      "output_dir": "models\\task3_bert",
+      "checkpoint": "artifacts\\task3_checkpoint.pt",
+      "resume": false,
+      "seed": 42,
+      "batch_size": 16,
+      "learning_rate": 2e-05,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.1,
+      "max_grad_norm": 1.0,
+      "device": "cuda",
+      "cpu_threads": 4,
+      "log_every": 100,
+      "fp32": false
+    },
+    "python_version": "3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]",
+    "library_versions": {
+      "numpy": "2.4.3",
+      "pandas": "2.3.3",
+      "scipy": "1.16.3",
+      "scikit-learn": "1.7.2",
+      "gensim": "4.4.0",
+      "torch": "2.8.0+cu126",
+      "transformers": "5.3.0"
+    },
+    "argv": [
+      "C:\\Users\\lenovo\\Desktop\\NLP\\scripts\\task3_bert.py",
+      "--nyt",
+      "HW-1/nyt.csv",
+      "--model-name",
+      "google-bert/bert-base-uncased",
+      "--max-length",
+      "64",
+      "--epochs",
+      "3",
+      "--batch-size",
+      "16",
+      "--output",
+      "results/task3_bert.json",
+      "--output-dir",
+      "models/task3_bert",
+      "--checkpoint",
+      "artifacts/task3_checkpoint.pt",
+      "--device",
+      "cuda",
+      "--log-every",
+      "100"
+    ]
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.23697687998687927,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.134581599999365,
+      "accuracy": 0.9600694444444444,
+      "macro_f1": 0.908321710316263
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.05264216228082525,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.09245659999942,
+      "accuracy": 0.9739583333333334,
+      "macro_f1": 0.9414428612261668
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.017625666777181376,
+      "training_examples": 9215,
+      "steps": 576,
+      "seconds": 47.00664549999965,
+      "accuracy": 0.9782986111111112,
+      "macro_f1": 0.9519557452089021
+    }
+  ],
+  "best_epoch": 3,
+  "selection_metric": "validation macro_f1",
+  "validation": {
+    "accuracy": 0.9782986111111112,
+    "macro_f1": 0.9519557452089021,
+    "labels": [
+      "business",
+      "politics",
+      "sports"
+    ],
+    "confusion_matrix": [
+      [
+        133,
+        8,
+        2
+      ],
+      [
+        7,
+        136,
+        2
+      ],
+      [
+        2,
+        4,
+        858
+      ]
+    ],
+    "classification_report": {
+      "business": {
+        "precision": 0.9366197183098591,
+        "recall": 0.9300699300699301,
+        "f1-score": 0.9333333333333333,
+        "support": 143.0
+      },
+      "politics": {
+        "precision": 0.918918918918919,
+        "recall": 0.9379310344827586,
+        "f1-score": 0.9283276450511946,
+        "support": 145.0
+      },
+      "sports": {
+        "precision": 0.9953596287703016,
+        "recall": 0.9930555555555556,
+        "f1-score": 0.9942062572421785,
+        "support": 864.0
+      },
+      "accuracy": 0.9782986111111112,
+      "macro avg": {
+        "precision": 0.9502994219996932,
+        "recall": 0.953685506702748,
+        "f1-score": 0.9519557452089021,
+        "support": 1152.0
+      },
+      "weighted avg": {
+        "precision": 0.9784466859540745,
+        "recall": 0.9782986111111112,
+        "f1-score": 0.9783579700141772,
+        "support": 1152.0
+      }
+    }
+  },
+  "test": {
+    "accuracy": 0.9826388888888888,
+    "macro_f1": 0.9605225478211615,
+    "labels": [
+      "business",
+      "politics",
+      "sports"
+    ],
+    "confusion_matrix": [
+      [
+        136,
+        6,
+        1
+      ],
+      [
+        7,
+        136,
+        2
+      ],
+      [
+        2,
+        2,
+        860
+      ]
+    ],
+    "classification_report": {
+      "business": {
+        "precision": 0.9379310344827586,
+        "recall": 0.951048951048951,
+        "f1-score": 0.9444444444444444,
+        "support": 143.0
+      },
+      "politics": {
+        "precision": 0.9444444444444444,
+        "recall": 0.9379310344827586,
+        "f1-score": 0.9411764705882353,
+        "support": 145.0
+      },
+      "sports": {
+        "precision": 0.996523754345307,
+        "recall": 0.9953703703703703,
+        "f1-score": 0.9959467284308049,
+        "support": 864.0
+      },
+      "accuracy": 0.9826388888888888,
+      "macro avg": {
+        "precision": 0.9596330777575033,
+        "recall": 0.9614501186340266,
+        "f1-score": 0.9605225478211615,
+        "support": 1152.0
+      },
+      "weighted avg": {
+        "precision": 0.9826954046265836,
+        "recall": 0.9826388888888888,
+        "f1-score": 0.9826598239193274,
+        "support": 1152.0
+      }
+    }
+  },
+  "training_seconds_this_invocation": 149.434467699999
+}

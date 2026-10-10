@@ -1,0 +1,17 @@
+{
+  "all_checks_passed": true,
+  "models_checked": 7,
+  "prediction_rows_checked": 16128,
+  "dataset_sha256": "de12ebe7f41316b798896bf975da840e2998f82393328d375fe5456a14e9eb2d",
+  "split_sha256": "02a5c4bb49199cc9103d887fe0c02124bb5284f3d56395c4fdef7e852136ab26",
+  "checks": [
+    "exact ordered 80/10/10 split",
+    "true labels",
+    "full test/validation predictions",
+    "independent Accuracy/Macro-F1/confusion-matrix recomputation",
+    "100-dimensional embeddings",
+    "full AG/NYT Word2Vec training corpora",
+    "specified BERT with length 64 and three full epochs",
+    "model selection using validation Macro-F1"
+  ]
+}
